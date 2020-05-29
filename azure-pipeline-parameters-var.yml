@@ -1,0 +1,41 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+- name: resourceGroup # name of the parameter; required
+  type: string # data type of the parameter; required
+  default: aks-resg-001
+- name: kubernetesServiceEndpoint
+  type: string
+  default: aks-sc
+- name: mySQLURI
+  type: string
+  default: mysql
+- name: mySqlUserName
+  type: string
+  default: mysql
+- name: mySqlPassword
+  type: string
+  default: mysql
+
+
+steps:
+- task: Kubernetes@1
+  displayName: Parameters for rating service
+  inputs:
+    connectionType: 'Kubernetes Service Connection'
+    kubernetesServiceEndpoint: $(ksc)
+    #command: 'apply'
+    containerRegistryType: 'Azure Container Registry'
+    configMapName: rating-service-mysql
+    configMapArguments: --from-literal=spring.datasource.url="${{ parameters.mySQLURI }}" --from-literal=spring.datasource.username=${{ parameters.mySqlUserName }}
+    secretName: rating-service-mysql
+    secretType: 'generic'
+    secretArguments: --from-literal=spring.datasource.password=${{ parameters.mySqlPassword }}
