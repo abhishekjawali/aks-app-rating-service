@@ -25,13 +25,15 @@ parameters:
   type: string
   default: mysql
 
+variables:
+  serviceconn: $(ksc)
 
 steps:
 - task: Kubernetes@1
   displayName: Parameters for rating service
   inputs:
     connectionType: 'Kubernetes Service Connection'
-    kubernetesServiceEndpoint: ${{ variables.ksc }}
+    kubernetesServiceEndpoint: $[variables.serviceconn]
     #command: 'apply'
     containerRegistryType: 'Azure Container Registry'
     configMapName: rating-service-mysql
