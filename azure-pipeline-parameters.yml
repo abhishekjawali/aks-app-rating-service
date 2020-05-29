@@ -1,0 +1,50 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+parameters:
+- name: resourceGroup # name of the parameter; required
+  type: string # data type of the parameter; required
+  default: aks-resg-001
+- name: kubernetesServiceEndpoint
+  type: string
+  default: aks-sc
+- name: mySQLURI
+  type: string
+  default: mysql
+- name: mySqlUserName
+  type: string
+  default: mysql
+- name: mySqlPassword
+  type: string
+  default: mysql
+
+
+steps:
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    ConnectedServiceName: ${{ parameters.serviceConnectionName }}
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: ${{ parameters.resourceGroup }}
+    location: 'eastus'
+    templateLocation: 'Linked artifact'
+    csmFile: aks-cluster/azuredeploy.json
+    csmParametersFile: aks-cluster/azuredeploy.parameter.json
+    deploymentMode: 'Incremental'
+- task: Kubernetes@1
+  displayName: Parameters for rating service
+  inputs:
+    connectionType: 'Kubernetes Service Connection'
+    kubernetesServiceEndpoint: ${{ parameters.kubernetesServiceEndpoint }}
+    command: 'apply'
+    configMapName: 'rating-service-mysql'
+    configMapArguments: --from-literal=spring.datasource.url="${{ parameters.mySQLURI }}" --from-literal=spring.datasource.username=${{ parameters.mySqlUserName }}
+    secretName: rating-service-mysql
+    secretArguments: --from-literal=spring.datasource.password=${{ parameters.mySqlPassword }}
