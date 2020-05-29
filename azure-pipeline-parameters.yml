@@ -32,9 +32,9 @@ steps:
   inputs:
     connectionType: 'Kubernetes Service Connection'
     kubernetesServiceEndpoint: ${{ parameters.kubernetesServiceEndpoint }}
-    command: 'apply'
+    #command: 'apply'
     containerRegistryType: 'Azure Container Registry'
-    configMapName: 'rating-service-mysql'
+    configMapName: rating-service-mysql
     configMapArguments: --from-literal=spring.datasource.url="${{ parameters.mySQLURI }}" --from-literal=spring.datasource.username=${{ parameters.mySqlUserName }}
     secretName: rating-service-mysql
     secretType: 'generic'
