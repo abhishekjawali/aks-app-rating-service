@@ -1,9 +1,9 @@
+FROM maven:3.6.3-jdk-8-slim AS build
+WORKDIR /home/rating-service
+COPY . /home/rating-service
+RUN mvn -f /home/rating-service/pom.xml clean package -DskipTests
+
 FROM java:8-jdk-alpine
-
-COPY ./target/rating-service.jar /usr/app/
-
-WORKDIR /usr/app
-
-RUN sh -c 'touch rating-service.jar'
-
+VOLUME /tmp
+COPY --from=build /home/rating-service/target/*.jar rating-service.jar
 ENTRYPOINT ["java","-jar","rating-service.jar"]
