@@ -27,17 +27,6 @@ parameters:
 
 
 steps:
-- task: AzureResourceManagerTemplateDeployment@3
-  inputs:
-    deploymentScope: 'Resource Group'
-    ConnectedServiceName: ${{ parameters.serviceConnectionName }}
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: ${{ parameters.resourceGroup }}
-    location: 'eastus'
-    templateLocation: 'Linked artifact'
-    csmFile: aks-cluster/azuredeploy.json
-    csmParametersFile: aks-cluster/azuredeploy.parameter.json
-    deploymentMode: 'Incremental'
 - task: Kubernetes@1
   displayName: Parameters for rating service
   inputs:
