@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: rating-service
-          image: dellemcacr.azurecr.io/rating-service
+          image: aksemcacr.azurecr.io/rating-service
           imagePullPolicy: IfNotPresent
           env:
             - name: spring.datasource.url
@@ -85,4 +85,4 @@ spec:
   selector:
     app: rating-service
   sessionAffinity: None
-  type: NodePort
+  type: LoadBalancer

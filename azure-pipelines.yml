@@ -8,11 +8,21 @@ trigger:
 resources:
 - repo: self
 
+parameters:
+- name: kubernetesServiceEndpoint
+  type: string
+  default: aks-sc
+- name: acrServiceConnection
+  type: string
+- name: acrName
+  type: string
+
+
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'dellemcacr-sc'
+  #dockerRegistryServiceConnection: 'dellemcacr-sc'
   imageRepository: 'rating-service'
-  containerRegistry: 'dellemcacr.azurecr.io'
+  #containerRegistry: 'dellemcacr.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
   
@@ -34,7 +44,7 @@ stages:
         command: buildAndPush
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
+        containerRegistry: ${{ parameters.acrServiceConnection }}
         tags: |
           $(tag)
 
@@ -75,7 +85,7 @@ stages:
     - task: KubernetesManifest@0
       inputs:
         action: 'deploy'
-        kubernetesServiceConnection: 'aks-sc'
+        kubernetesServiceConnection: ${{ parameters.kubernetesServiceEndpoint }}
         namespace: 'default'
         manifests: '$(System.ArtifactsDirectory)/deployment.yaml'
-        containers: 'dellemcacr.azurecr.io/rating-service:$(tag)'
+        containers: '${{ parameters.acrName }}.azurecr.io/rating-service:$(tag)'
